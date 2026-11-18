@@ -780,7 +780,13 @@ Object.assign(window, {
 
 const { useState, useEffect, useRef } = React;
 
-const VERSION_API = "https://backaevup.com/v1api/v2/helper/version?appType=10&address=";
+// 原逻辑：请求版本接口拿 download_link 直接下载 APK，暂时停用，保留备查
+// const VERSION_API = "https://backaevup.com/v1api/v2/helper/version?appType=10&address=";
+
+// 下载按钮跳转：手机去多签名包页，PC 去下载页
+const PACKAGES_URL = "https://m.ave.ai/download/packages";
+const PC_DOWNLOAD_URL = "https://m.ave.ai/download";
+const isMobileUA = () => /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|OpenHarmony/i.test(navigator.userAgent);
 
 /* resource map — uses inlined blobs when bundled, falls back to relative paths in dev */
 const R = (window.__resources || {});
@@ -852,6 +858,9 @@ const POINTS = [
 
 /* ---- pieces ---- */
 function DownloadBtn({ lang, size }) {
+  const label = lang === 'en' ? 'Download APK' : '立即下载 APK';
+
+  /* 原逻辑：点击后请求 VERSION_API 拿 download_link 直接下载，暂时停用，保留备查
   const [state, setState] = useState('idle'); // idle | loading | done | error
 
   async function handleClick() {
@@ -885,12 +894,17 @@ function DownloadBtn({ lang, size }) {
     ? (lang === 'en' ? 'Failed, retry' : '获取失败，请重试')
     : (lang === 'en' ? 'Download APK' : '立即下载 APK');
 
-  return (
-    <button
-      className={"dlbtn " + (size || "")}
+  按钮上对应的属性：
       onClick={handleClick}
       disabled={state === 'loading'}
       style={{ cursor: state === 'loading' ? 'wait' : 'pointer', border: 'none' }}
+  */
+
+  return (
+    <button
+      className={"dlbtn " + (size || "")}
+      onClick={() => { window.location.href = isMobileUA() ? PACKAGES_URL : PC_DOWNLOAD_URL; }}
+      style={{ cursor: 'pointer', border: 'none' }}
     >
       <span className="ico">{Ico.download({})}</span>
       <span className="lab">
